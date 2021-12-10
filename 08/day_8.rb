@@ -110,17 +110,31 @@ class Day8 < AocBase
 
     puts @mappings.inspect
     # we know b, f, g (b = seen in 4, f = seen in 7, g = new one we've not seen from 1, 4, 7)
-    @input_mapping['b'] = (@mappings[5] - @mappings[7]) # & @mappings[4]
+    # @input_mapping['b'] = (@mappings[5] - @mappings[7]) # & @mappings[4]
     @input_mapping['f'] = (@mappings[5] & @mappings[7]) - [@input_mapping['a']]
     @input_mapping['g'] = @mappings[5] - @mappings[7] - @mappings[4]
+
+    puts @input_mapping.inspect
+  end
+
+  def map_2
+    # b = 0 - 2 - 7
+    @input_mapping['b'] = @mappings[0] - @mappings[2] - @mappings[7]
+  end
+
+  def map_0
+    # e = 0 - 5 - 7
+    @input_mapping['e'] = @mappings[0] - @mappings[5] - @mappings[7]
+  end
+
+
+
     # we know d, missing pair from 4, we know c, missing pair from 7
     @input_mapping['d'] = @mappings[4] - [@input_mapping['b']]
     @input_mapping['c'] = @mappings[7] - [@input_mapping['b']] - [@input_mapping['a']]
     # a, b, c, d, f, g mapped
     # e is left, and implied
     @input_mapping['e'] = ['a', 'b', 'c', 'd', 'e', 'f', 'g'] - @input_mapping.keys
-    puts @input_mapping.inspect
-  end
 end
 
 # puts Day8.new('test.txt').run_1

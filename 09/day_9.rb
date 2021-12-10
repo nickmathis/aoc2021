@@ -1,112 +1,53 @@
 require '../aoc_base'
 
-class Day4 < AocBase
+class Day9 < AocBase
   def initialize(filename)
     super(filename)
-    @numbers = @data.shift.split(',')
-    @winning_boards = []
-    load_boards
+
+    @map = []
+    @data.each do |r|
+      @map << r.split('')
+    end
+
+    @map.each { |i| puts i.inspect }
   end
 
   def run_1
-    @numbers.each do |number|
-      if winning_board = check_number(number)
-        return calculate_winner_score(winning_board, number)
-      end
-    end
-    'no winner found'
-  end
+    @lowest_points = []
+    @lowest_points_debug = []
 
-  def check_number(number)
-    winning_board = nil
-    @boards.each_with_index do |board, b_i|
-      puts "trying #{number} in #{board.inspect}"
+    @map.each_with_index do |row, a|
+      row.each_with_index do |item, b|
+        # bounds check and next if it's not lowest point
+        # puts "next if #{a} > 0 && #{item} > #{@map[a-1][b]}"
+        # puts "next if #{b} > 0 && #{item} > #{@map[a][b-1]}"
+        # puts "next if #{b} < (#{row.size} - 1) && #{item} > #{@map[a][b+1]}"
+        # puts "next if #{a} < (#{@map.size} - 1) && #{item} > #{@map[a+1][b]}"
 
-      board.each_with_index do |row, r_i|
-        row.each_with_index do |item, i_i|
-
-          if item[0] == number
-            puts "found #{number}"
-            @boards[b_i][r_i][i_i][1] = 1
-            if check_column(@boards[b_i], i_i) || check_row(@boards[b_i], r_i) || check_diagonals(@boards[b_i])
-              puts @winning_boards.inspect
-              if !@winning_boards.include?(b_i) # if has not won yet
-                puts "first win for #{b_i}"
-                @winning_boards << b_i
-                winning_board = board
-              end
-            end
-          end
-        end
+        next if a > 0 && item >= @map[a-1][b] # up
+        next if b > 0 && item >= @map[a][b-1] # left
+        next if b < row.size - 1 && item >= @map[a][b+1] # right
+        next if a < @map.size - 1 && item >= @map[a+1][b] #down
+        puts "**** lowest point (#{item}) found at [#{a}][#{b}] **** "
+        @lowest_points << item.to_i + 1
+        @lowest_points_debug << [item.to_i + 1, a, b]
       end
     end
 
-    return winning_board || false
+    @lowest_points_debug.each { |row| puts row.inspect }
+    @lowest_points.inject(:+)  #+ @lowest_points.size
   end
+
 
   def run_2
-    last_score = 0
-    @numbers.each do |number|
-      if winning_board = check_number(number)
-        puts "Winner found #{winning_board.inspect}"
-        last_score = calculate_winner_score(winning_board, number)
-        puts last_score
-      end
-    end
-    last_score
+
   end
 
-  def load_boards
-    @boards = []
-    board_number = -1
-    
-    @data.each do |row|
-      if row == ""
-        board_number += 1 
-        @boards[board_number] = []
-        next
-      end
-      @boards[board_number] << row.split(' ').collect {|item| [item, 0]}
-    end
-  end
 
-  def check_column(board, col)
-    puts "trying #{board} at C#{col}" if @debug
-    5.times do |i|
-      return false if board[i][col].last == 0
-    end
-    puts "Winner #{board.inspect} #{col}" if @debug
-    return 1
-  end
-
-  def check_row(board, row)
-    puts "trying #{board} at R#{row}" if @debug
-    5.times do |i|
-      return false if board[row][i].last == 0
-    end
-    puts "Winner #{board.inspect} #{row}" if @debug
-    return 1
-  end
-
-  def check_diagonals(board)
-    puts "trying #{board} diagonals" if @debug
-    5.times do |i|
-      return false if board[i][i].last == 0
-      return false if board[i][5-i-1].last == 0
-    end
-    puts "Winner #{board.inspect} (diagonal)" if @debug
-    return 1
-  end
-
-  def calculate_winner_score(board, number)
-    score = 0
-    board.each {|r| r.each {|i| score += i.first.to_i if i.last == 0 } }
-    score * number.to_i
-  end
 end
 
-# puts Day4.new('test.txt').run_1
-# puts Day4.new('data.txt').run_1
-# puts Day4.new('test.txt').run_2
-puts Day4.new('data.txt').run_2
+# puts Day9.new('test.txt').run_1
+puts Day9.new('data.txt').run_1
+# puts Day9.new('test.txt').run_2
+# puts Day9.new('data.txt').run_2
 
